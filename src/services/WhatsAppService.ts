@@ -34,13 +34,22 @@ export class WhatsAppService {
   }
 
 
-  async sendMessage(sessionId: string, to: string, message: string): Promise<any> { // Especificar tipo de retorno
+  async sendMessage(sessionId: string, to: string, message: string): Promise<any> {
     const client = this.sessions.get(sessionId);
     if (!client) {
       throw new Error("Session not found");
     }
 
     return client.sendText(to, message);
+  }
+
+  async sendImageWithText(sessionId: string, to: string, imageUrl: string, caption?: string): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendImage(to, imageUrl, 'image', caption);
   }
 
   async closeSession(sessionId: string): Promise<void> {

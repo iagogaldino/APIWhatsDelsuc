@@ -18,7 +18,7 @@ export class SessionController {
 
       await this.whatsAppService.createSession(sessionId);
       return res.status(201).json({ message: "Session created successfully" });
-    } catch (error) {
+    } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
   }
@@ -34,7 +34,8 @@ export class SessionController {
 
       const result = await this.whatsAppService.sendMessage(sessionId, to, message);
       return res.status(200).json(result);
-    } catch (error) {
+    } catch (error: any) {
+      console.log('API ERROR: ', error);
       return res.status(500).json({ error: error.message });
     }
   }
@@ -44,7 +45,7 @@ export class SessionController {
       const { sessionId } = req.params;
       await this.whatsAppService.closeSession(sessionId);
       return res.status(200).json({ message: "Session closed successfully" });
-    } catch (error) {
+    } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
   }

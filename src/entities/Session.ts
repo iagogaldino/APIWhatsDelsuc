@@ -1,11 +1,13 @@
-
 import { Entity, Column, PrimaryColumn } from "typeorm";
 
-@Entity()
+@Entity("sessions") // Nome da tabela no banco de dados
 export class Session {
   @PrimaryColumn()
-  sessionId: string;
+  sessionId!: string; // Usa "!" para indicar que sempre será definido
 
-  @Column()
-  status: string;
+  @Column({
+    type: "varchar", // Definindo o tipo do campo no banco
+    length: 50
+  })
+  status!: string; // Usa "!" para indicar que sempre será definido
 }

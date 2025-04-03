@@ -10,31 +10,37 @@ export class WhatsAppService {
     this.sessionRepository = new SessionRepository();
   }
 
-  async createSession(sessionId: string): Promise<void> {
+  async createSession(sessionId: string): Promise<Whatsapp> { // Retornando o client
     try {
       const session = await this.sessionRepository.create(sessionId);
       
-      const client = await create({
-        session: sessionId,
-        multidevice: true,
-        headless: true
-      });
+      const client = await create(
+        sessionId,
+        undefined,
+        undefined,
+        {
+          headless: 'new'
+        }
+      );
 
       this.sessions.set(sessionId, client);
       await this.sessionRepository.updateStatus(sessionId, "started");
-    } catch (error) {
+
+      return client;
+    } catch (error: any) {
       await this.sessionRepository.updateStatus(sessionId, "error");
       throw new Error(`Failed to create session: ${error.message}`);
     }
   }
 
-  async sendMessage(sessionId: string, to: string, message: string): Promise<any> {
+
+  async sendMessage(sessionId: string, to: string, message: string): Promise<any> { // Especificar tipo de retorno
     const client = this.sessions.get(sessionId);
     if (!client) {
       throw new Error("Session not found");
     }
 
-    return await client.sendText(to, message);
+    return client.sendText(to, message);
   }
 
   async closeSession(sessionId: string): Promise<void> {
@@ -43,6 +49,8 @@ export class WhatsAppService {
       await client.close();
       this.sessions.delete(sessionId);
       await this.sessionRepository.updateStatus(sessionId, "closed");
+    } else {
+      throw new Error("Session not found or already closed"); // Adiciona mensagem de erro para feedback claro
     }
   }
 }

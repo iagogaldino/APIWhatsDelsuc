@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp QR Code</title>
+    <script src="/socket.io/client-dist/socket.io.js"></script>
+    <style>
+        body { 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        #qrcode {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan QR Code</h1>
+    <div id="qrcode"></div>
+    <div id="status"></div>
+
+    <script>
+        const sessionId = window.location.pathname.split('/')[2];
+        const socket = io();
+        
+        socket.emit('join', sessionId);
+        
+        socket.on('qr', (qr) => {
+            document.getElementById('qrcode').innerHTML = `<img src="${qr}" />`;
+            document.getElementById('status').textContent = 'Waiting for scan...';
+        });
+        
+        socket.on('ready', () => {
+            document.getElementById('status').textContent = 'WhatsApp Connected!';
+            document.getElementById('qrcode').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

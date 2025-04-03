@@ -10,14 +10,28 @@ export class WhatsAppService {
     this.sessionRepository = new SessionRepository();
   }
 
-  async createSession(sessionId: string): Promise<Whatsapp> { // Retornando o client
+  private io: any;
+
+  setSocketIO(io: any) {
+    this.io = io;
+  }
+
+  async createSession(sessionId: string): Promise<Whatsapp> {
     try {
       const session = await this.sessionRepository.create(sessionId);
       
       const client = await create(
         sessionId,
-        undefined,
-        undefined,
+        (qr) => {
+          if (this.io) {
+            this.io.to(sessionId).emit('qr', qr);
+          }
+        },
+        (statusSession) => {
+          if (statusSession === 'qrReadSuccess' && this.io) {
+            this.io.to(sessionId).emit('ready');
+          }
+        },
         {
           headless: 'new'
         }

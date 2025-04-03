@@ -17,7 +17,8 @@ export class SessionController {
       }
 
       await this.whatsAppService.createSession(sessionId);
-      return res.status(201).json({ message: "Session created successfully" });
+      const qrUrl = `${req.protocol}://${req.get('host')}/qr/${sessionId}`;
+      return res.status(201).json({ message: "Session created successfully", qrUrl });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }

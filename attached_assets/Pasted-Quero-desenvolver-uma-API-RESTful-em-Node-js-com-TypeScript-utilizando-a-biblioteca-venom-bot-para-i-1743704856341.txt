@@ -1,0 +1,139 @@
+Quero desenvolver uma API RESTful em Node.js com TypeScript utilizando a biblioteca venom-bot para integração com o WhatsApp. A API deve permitir que múltiplos clientes criem suas próprias sessões, enviem mensagens e encerrem sessões através de endpoints HTTP.
+
+A persistência de dados será feita utilizando PostgreSQL e TypeORM para armazenar informações sobre as sessões. Mensagens enviadas não precisam ser armazenadas no banco de dados, apenas processadas e retornadas pela API. Durante o desenvolvimento, o uso de Nodemon é obrigatório para facilitar o recarregamento automático do servidor.
+
+O projeto deve seguir os princípios do SOLID para garantir um código limpo, desacoplado e de fácil manutenção.
+
+💡 Requisitos Funcionais:
+
+Gerenciamento de Sessões de WhatsApp:
+
+Permitir que múltiplos clientes criem sessões únicas identificadas por um sessionId.
+
+Registrar cada sessão criada no banco de dados com os seguintes atributos:
+
+id: UUID gerado automaticamente.
+
+sessionId: Identificador único fornecido pelo cliente.
+
+status: Status atual da sessão (iniciada, encerrada).
+
+created_at: Data e hora de criação.
+
+updated_at: Data e hora da última atualização.
+
+Envio de Mensagens:
+
+Permitir o envio de mensagens através de sessões ativas, referenciadas pelo sessionId.
+
+A API deve processar a mensagem e retornar o status de envio.
+
+As mensagens não devem ser armazenadas no banco de dados.
+
+Encerramento de Sessões:
+
+Permitir que clientes encerrem suas sessões de forma explícita através de um endpoint.
+
+Atualizar o status da sessão no banco de dados como encerrada.
+
+🗃️ Estrutura do Banco de Dados (PostgreSQL):
+
+Tabela sessions:
+
+id (UUID): Identificador único da sessão.
+
+sessionId (String): Identificador fornecido pelo cliente.
+
+status (String): Status atual da sessão (iniciada, encerrada).
+
+created_at (Timestamp): Data e hora de criação da sessão.
+
+updated_at (Timestamp): Data e hora da última atualização.
+
+🚀 Tecnologias e Dependências:
+
+Node.js - Plataforma para construção do servidor.
+
+TypeScript - Linguagem principal para desenvolvimento.
+
+Express - Framework HTTP para gerenciamento de rotas e middlewares.
+
+venom-bot - Biblioteca para integração com o WhatsApp.
+
+PostgreSQL - Banco de dados relacional utilizado para persistência de sessões.
+
+TypeORM - ORM para mapeamento de entidades e comunicação com o banco de dados.
+
+dotenv - Gerenciamento de variáveis de ambiente.
+
+ts-node - Execução de código TypeScript diretamente no ambiente Node.js.
+
+nodemon - Ferramenta para recarregamento automático do servidor durante o desenvolvimento.
+
+uuid - Gerador de identificadores únicos para sessões.
+
+🔑 Endpoints Necessários:
+
+Criar Sessão:
+
+Método: POST
+
+URL: /api/whatsapp/session
+
+Body: { "sessionId": "cliente1" }
+
+Retorno: Confirmação da criação da sessão e detalhes (ex.: status, id).
+
+Enviar Mensagem:
+
+Método: POST
+
+URL: /api/whatsapp/message
+
+Body: { "sessionId": "cliente1", "phoneNumber": "5511999999999", "message": "Olá!" }
+
+Retorno: Status de envio da mensagem.
+
+Encerrar Sessão:
+
+Método: DELETE
+
+URL: /api/whatsapp/session
+
+Body: { "sessionId": "cliente1" }
+
+Retorno: Confirmação de encerramento da sessão.
+
+📌 Requisitos Não Funcionais:
+
+Código organizado em camadas:
+
+Controllers: Interface entre a API e o cliente, processa requisições e respostas.
+
+Services: Regras de negócios e manipulação dos dados.
+
+Repositories: Comunicação direta com o banco de dados usando TypeORM.
+
+Entities: Modelos das tabelas no banco de dados.
+
+Use Cases: Aplicar princípios SOLID para cada funcionalidade principal.
+
+Aplicar Princípios SOLID:
+
+Single Responsibility Principle (SRP): Cada classe ou módulo deve ter uma única responsabilidade.
+
+Open/Closed Principle (OCP): Código deve ser aberto para extensão, mas fechado para modificação.
+
+Liskov Substitution Principle (LSP): Objetos devem ser substituíveis por suas classes derivadas sem quebrar o sistema.
+
+Interface Segregation Principle (ISP): Interfaces específicas para cada necessidade, evitando interfaces muito genéricas.
+
+Dependency Inversion Principle (DIP): Depender de abstrações e não de implementações concretas.
+
+Documentação adequada no README.md.
+
+Uso do Nodemon para desenvolvimento com recarregamento automático (npm run dev).
+
+Uso de TypeScript para maior segurança e clareza no desenvolvimento.
+
+Código transpilado para JavaScript (npm run build) para produção.

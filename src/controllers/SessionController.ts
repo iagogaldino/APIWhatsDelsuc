@@ -43,13 +43,26 @@ export class SessionController {
   async sendImageWithText(req: Request, res: Response): Promise<Response> {
     try {
       const { sessionId } = req.params;
-      const { to, imageUrl, caption } = req.body;
+      const { to, imageUrl, base64Image, caption } = req.body;
+      const imageFile = req.file;
 
-      if (!to || !imageUrl) {
-        return res.status(400).json({ error: "To and imageUrl are required" });
+      if (!to) {
+        return res.status(400).json({ error: "Recipient (to) is required" });
       }
 
-      const result = await this.whatsAppService.sendImageWithText(sessionId, to, imageUrl, caption);
+      if (!imageUrl && !base64Image && !imageFile) {
+        return res.status(400).json({ error: "Image must be provided via URL, base64, or file upload" });
+      }
+
+      let result;
+      if (imageFile) {
+        result = await this.whatsAppService.sendImageFile(sessionId, to, imageFile.buffer, caption);
+      } else if (base64Image) {
+        result = await this.whatsAppService.sendBase64Image(sessionId, to, base64Image, caption);
+      } else {
+        result = await this.whatsAppService.sendImageWithText(sessionId, to, imageUrl, caption);
+      }
+
       return res.status(200).json(result);
     } catch (error: any) {
       console.log('API ERROR: ', error);

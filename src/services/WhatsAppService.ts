@@ -52,6 +52,24 @@ export class WhatsAppService {
     return client.sendImage(to, imageUrl, 'image', caption);
   }
 
+  async sendImageFile(sessionId: string, to: string, buffer: Buffer, caption?: string): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendImageFromBase64(to, buffer.toString('base64'), 'image', caption);
+  }
+
+  async sendBase64Image(sessionId: string, to: string, base64Image: string, caption?: string): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendImageFromBase64(to, base64Image, 'image', caption);
+  }
+
   async closeSession(sessionId: string): Promise<void> {
     const client = this.sessions.get(sessionId);
     if (client) {

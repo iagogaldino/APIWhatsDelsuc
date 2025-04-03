@@ -1,0 +1,118 @@
+
+{
+  "info": {
+    "name": "WhatsApp API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/sessions",
+          "host": ["{{base_url}}"],
+          "path": ["sessions"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"sessionId\": \"session123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Send Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/sessions/:sessionId/messages",
+          "host": ["{{base_url}}"],
+          "path": ["sessions", ":sessionId", "messages"],
+          "variable": [
+            {
+              "key": "sessionId",
+              "value": "session123"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"to\": \"5511999999999@c.us\",\n    \"message\": \"Hello World!\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Send Image with Text",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/sessions/:sessionId/images",
+          "host": ["{{base_url}}"],
+          "path": ["sessions", ":sessionId", "images"],
+          "variable": [
+            {
+              "key": "sessionId",
+              "value": "session123"
+            }
+          ]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "to",
+              "value": "5511999999999@c.us",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": ""
+            },
+            {
+              "key": "caption",
+              "value": "Image caption",
+              "type": "text"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Close Session",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/sessions/:sessionId",
+          "host": ["{{base_url}}"],
+          "path": ["sessions", ":sessionId"],
+          "variable": [
+            {
+              "key": "sessionId",
+              "value": "session123"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5500"
+    }
+  ]
+}

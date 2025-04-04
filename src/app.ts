@@ -11,7 +11,7 @@ const port = 5500;
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
-const whatsAppService = new WhatsAppService();
+// const whatsAppService = new WhatsAppService();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,16 +21,17 @@ app.get('/qr/:sessionId', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'qr.html'));
 });
 
-whatsAppService.setSocketIO(io);
-
+// whatsAppService.setSocketIO(ioApp);
+export let ioApp: any = io;;
 io.on('connection', (socket) => {
   socket.on('join', (sessionId) => {
+    console.log(`User joined session: ${sessionId}`);
     socket.join(sessionId);
   });
 });
 
 AppDataSource.initialize().then(() => {
-  httpServer.listen(port, "0.0.0.0", () => {
+  httpServer.listen(port, "localhost", () => {
     console.log(`Server running on port ${port}`);
   });
 });

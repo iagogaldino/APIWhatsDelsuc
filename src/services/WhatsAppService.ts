@@ -1,5 +1,6 @@
 import { create, Whatsapp } from "venom-bot";
 import { SessionRepository } from "../repositories/SessionRepository";
+import { ioApp } from "../app";
 
 export class WhatsAppService {
   private sessions: Map<string, Whatsapp>;
@@ -18,28 +19,28 @@ export class WhatsAppService {
 
   async createSession(sessionId: string): Promise<Whatsapp> {
     try {
-      const session = await this.sessionRepository.create(sessionId);
-      
+      // const session = await this.sessionRepository.create(sessionId);
+  
       const client = await create(
         sessionId,
         (qr) => {
-          if (this.io) {
-            this.io.to(sessionId).emit('qr', qr);
-          }
+          if (ioApp) {
+            console.log("QR Code received");
+            ioApp.to(sessionId).emit('qr', qr); // Emite o QR Code para o frontend via socket
+          } 
         },
         (statusSession) => {
-          if (statusSession === 'qrReadSuccess' && this.io) {
-            this.io.to(sessionId).emit('ready');
-          }
+          console.log(`Session status: ${statusSession}`);
+          ioApp.to(sessionId).emit('ready'); // Informa ao frontend que a sessão está pronta
         },
         {
-          headless: 'new'
+          headless: 'new', // Corrigido para um boolean, que é o valor esperado pelo Venom
         }
       );
-
+  
       this.sessions.set(sessionId, client);
       await this.sessionRepository.updateStatus(sessionId, "started");
-
+  
       return client;
     } catch (error: any) {
       await this.sessionRepository.updateStatus(sessionId, "error");

@@ -1,27 +1,82 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>WhatsApp QR Code</title>
-    <script src="/socket.io/client-dist/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <style>
-        body { 
-            display: flex; 
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: Arial, sans-serif;
+            justify-content: center;
+            background-color: #f0f0f0;
+            font-family: 'Roboto', sans-serif;
+            transition: background-color 0.3s;
         }
+
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
         #qrcode {
             margin: 20px;
             padding: 20px;
-            border: 1px solid #ccc;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        img {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #4a4a4a;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .connected {
+            color: #2ecc71;
+        }
+
+        .waiting {
+            color: #e74c3c;
         }
     </style>
 </head>
 <body>
-    <h1>Scan QR Code</h1>
-    <div id="qrcode"></div>
-    <div id="status"></div>
+    <h1>WhatsApp QR Code Scanner</h1>
+    <div id="qrcode">
+        <div class="spinner"></div>
+    </div>
+    <div id="status" class="waiting">Waiting for QR Code...</div>
 
     <script>
         const sessionId = window.location.pathname.split('/')[2];
@@ -30,12 +85,16 @@
         socket.emit('join', sessionId);
         
         socket.on('qr', (qr) => {
-            document.getElementById('qrcode').innerHTML = `<img src="${qr}" />`;
+            console.log('QR Code received:');
+            document.getElementById('qrcode').innerHTML = `<img src="${qr}" alt="QR Code" />`;
             document.getElementById('status').textContent = 'Waiting for scan...';
+            document.getElementById('status').className = 'waiting';
         });
         
         socket.on('ready', () => {
+            document.body.style.backgroundColor = '#e0ffe0';
             document.getElementById('status').textContent = 'WhatsApp Connected!';
+            document.getElementById('status').className = 'connected';
             document.getElementById('qrcode').style.display = 'none';
         });
     </script>

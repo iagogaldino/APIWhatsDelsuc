@@ -16,7 +16,7 @@ export class SessionController {
         return res.status(400).json({ error: "SessionId is required" });
       }
 
-      await this.whatsAppService.createSession(sessionId);
+      this.whatsAppService.createSession(sessionId);
       const qrUrl = `${req.protocol}://${req.get('host')}/qr/${sessionId}`;
       return res.status(201).json({ message: "Session created successfully", qrUrl });
     } catch (error: any) {

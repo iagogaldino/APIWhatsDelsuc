@@ -3,103 +3,78 @@
 <head>
     <title>WhatsApp QR Code</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: #121212;
-            font-family: 'Roboto', sans-serif;
-            transition: background-color 0.3s;
-            color: #E0E0E0;
+            font-family: 'Inter', sans-serif;
         }
-
-        h1 {
-            color: #00FF88;
-            margin-bottom: 20px;
-            font-size: 2rem;
-            text-align: center;
-            text-shadow: 0 0 10px #00FF88, 0 0 20px #00FF88;
+        .gradient-text {
+            background: linear-gradient(45deg, #00FF88, #00E5FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        #qrcode {
-            margin: 20px;
-            padding: 20px;
-            background: #1E1E1E;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
+        .gradient-border {
+            position: relative;
+            border: double 3px transparent;
+            border-radius: 16px;
+            background-image: linear-gradient(#1E1E1E, #1E1E1E), 
+                            linear-gradient(45deg, #00FF88, #00E5FF);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
         }
-
-        img {
-            max-width: 300px;
-            max-height: 300px;
-            border-radius: 8px;
-            border: 2px solid #00FF88;
-        }
-
-        #status {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            text-shadow: 0 0 5px #00FF88;
-        }
-
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-top: 4px solid #00FF88;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-top: 20px;
-        }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .connected {
-            color: #00FF88;
-            text-shadow: 0 0 5px #00FF88, 0 0 10px #00FF88;
+        .spinner {
+            animation: spin 1s linear infinite;
         }
 
-        .waiting {
-            color: #FF5555;
-            text-shadow: 0 0 5px #FF5555, 0 0 10px #FF5555;
+        img {
+            margin: auto;
+            border: solid 9px white;
         }
     </style>
 </head>
-<body>
-    <h1>WhatsApp QR Code Scanner</h1>
-    <div id="qrcode">
-        <div class="spinner"></div>
+<body class="min-h-screen bg-[#121212] flex flex-col items-center justify-center p-6">
+    <div class="text-center max-w-xl w-full">
+        <h1 class="text-4xl font-bold mb-8 gradient-text">
+            WhatsApp QR Code Scanner
+        </h1>
+
+        <div id="qrcode" class="p-1 mb-6 flex items-center justify-center min-h-[140px]">
+            <svg class="spinner w-12 h-12 text-[#00FF88]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <div id="status" class="text-xl font-semibold text-[#FF5555]">
+            Waiting for QR Code...
+        </div>
     </div>
-    <div id="status" class="waiting">Waiting for QR Code...</div>
 
     <script>
         const sessionId = window.location.pathname.split('/')[2];
         const socket = io();
-        
+
         socket.emit('join', sessionId);
-        
+
         socket.on('qr', (qr) => {
             console.log('QR Code received:');
-            document.getElementById('qrcode').innerHTML = `<img src="${qr}" alt="QR Code" />`;
+            document.getElementById('qrcode').innerHTML = `
+                <img src="${qr}" alt="QR Code" class="max-w-[300px] rounded-lg"/>
+            `;
             document.getElementById('status').textContent = 'Waiting for scan...';
-            document.getElementById('status').className = 'waiting';
+            document.getElementById('status').className = 'text-xl font-semibold text-[#FF5555]';
+            document.getElementById('qrcode').style.display = 'block';
+
         });
-        
+
         socket.on('ready', () => {
-            document.body.style.backgroundColor = '#0D0D0D';
             document.getElementById('status').textContent = 'WhatsApp Connected!';
-            document.getElementById('status').className = 'connected';
+            document.getElementById('status').className = 'text-xl font-semibold text-[#00FF88]';
             document.getElementById('qrcode').style.display = 'none';
         });
     </script>

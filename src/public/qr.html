@@ -11,24 +11,26 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #f0f0f0;
+            background-color: #121212;
             font-family: 'Roboto', sans-serif;
             transition: background-color 0.3s;
+            color: #E0E0E0;
         }
 
         h1 {
-            color: #4a4a4a;
+            color: #00FF88;
             margin-bottom: 20px;
             font-size: 2rem;
             text-align: center;
+            text-shadow: 0 0 10px #00FF88, 0 0 20px #00FF88;
         }
 
         #qrcode {
             margin: 20px;
             padding: 20px;
-            background: white;
+            background: #1E1E1E;
             border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -39,17 +41,18 @@
             max-width: 300px;
             max-height: 300px;
             border-radius: 8px;
+            border: 2px solid #00FF88;
         }
 
         #status {
             margin-top: 20px;
             font-size: 1.2rem;
-            color: #4a4a4a;
+            text-shadow: 0 0 5px #00FF88;
         }
 
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
-            border-top: 4px solid #3498db;
+            border-top: 4px solid #00FF88;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -63,11 +66,13 @@
         }
 
         .connected {
-            color: #2ecc71;
+            color: #00FF88;
+            text-shadow: 0 0 5px #00FF88, 0 0 10px #00FF88;
         }
 
         .waiting {
-            color: #e74c3c;
+            color: #FF5555;
+            text-shadow: 0 0 5px #FF5555, 0 0 10px #FF5555;
         }
     </style>
 </head>
@@ -92,7 +97,7 @@
         });
         
         socket.on('ready', () => {
-            document.body.style.backgroundColor = '#e0ffe0';
+            document.body.style.backgroundColor = '#0D0D0D';
             document.getElementById('status').textContent = 'WhatsApp Connected!';
             document.getElementById('status').className = 'connected';
             document.getElementById('qrcode').style.display = 'none';

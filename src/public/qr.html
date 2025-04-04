@@ -14,44 +14,42 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .gradient-border {
-            position: relative;
-            border: double 3px transparent;
-            border-radius: 16px;
-            background-image: linear-gradient(#1E1E1E, #1E1E1E), 
-                            linear-gradient(45deg, #00FF88, #00E5FF);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
+        .spinner {
+            animation: spin 1s linear infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-
-        img {
-            margin: auto;
-            border: solid 9px white;
-        }
     </style>
 </head>
-<body class="min-h-screen bg-[#121212] flex flex-col items-center justify-center p-6">
-    <div class="text-center max-w-xl w-full">
-        <h1 class="text-4xl font-bold mb-8 gradient-text">
-            WhatsApp QR Code Scanner
-        </h1>
+<body class="min-h-screen bg-[#121212] flex items-center justify-center p-6">
+    <div class="text-center max-w-xl w-full gradient-border rounded-2xl p-6 flex flex-col items-center">
+        <h1 class="text-4xl font-bold mb-8 gradient-text">WhatsApp QR Code Scanner</h1>
 
-        <div id="qrcode" class="p-1 mb-6 flex items-center justify-center min-h-[140px]">
+        <!-- Loader agora está oculto por padrão -->
+        <div id="loader" class="p-1 mb-6 flex items-center justify-center min-h-[140px] hidden">
             <svg class="spinner w-12 h-12 text-[#00FF88]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
         </div>
 
-        <div id="status" class="text-xl font-semibold text-[#FF5555]">
-            Waiting for QR Code...
+        <div id="qrcode" class="p-1 mb-6 flex items-center justify-center min-h-[140px] hidden"></div>
+
+        <div id="status" class="text-xl font-semibold text-[#FF5555] mb-4">Waiting for connection...</div>
+
+        <!-- Botão centralizado -->
+        <div class="flex justify-center w-full">
+            <button
+                class="px-6 py-3 bg-[#00FF88] text-black font-bold rounded-xl shadow-lg hover:bg-[#00E5FF] transition duration-300 ease-in-out flex items-center justify-center"
+                onclick="connect()"
+            >
+                Connect to WhatsApp
+                <svg class="w-6 h-6 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-width="2" d="M12 1.5C5.925 1.5 1.5 5.925 1.5 12S5.925 22.5 12 22.5 22.5 18.075 22.5 12 18.075 1.5 12 1.5zM9.75 16.25l-2-2m0-4l2-2m4-2l2-2m4-2l2-2m0 4l2-2m0 4l-2-2m0 4l-2-2m0 4l-2-2"></path>
+                </svg>
+            </button>
         </div>
     </div>
 
@@ -63,19 +61,35 @@
 
         socket.on('qr', (qr) => {
             console.log('QR Code received:');
+            document.getElementById('loader').classList.add('hidden');
             document.getElementById('qrcode').innerHTML = `
-                <img src="${qr}" alt="QR Code" class="max-w-[300px] rounded-lg"/>
+                <img src="${qr}" alt="QR Code" class="max-w-[300px] rounded-lg border-4 border-[#00FF88] shadow-md"/>
             `;
+            document.getElementById('qrcode').classList.remove('hidden');
             document.getElementById('status').textContent = 'Waiting for scan...';
-            document.getElementById('status').className = 'text-xl font-semibold text-[#FF5555]';
-            document.getElementById('qrcode').style.display = 'block';
-
+            document.getElementById('status').className = 'text-xl font-semibold text-[#FFAA00]';
         });
 
         socket.on('ready', () => {
             document.getElementById('status').textContent = 'WhatsApp Connected!';
             document.getElementById('status').className = 'text-xl font-semibold text-[#00FF88]';
-            document.getElementById('qrcode').style.display = 'none';
+            document.getElementById('qrcode').classList.add('hidden');
+            document.getElementById('loader').classList.add('hidden');
+        });
+
+        function connect() {
+            socket.emit('start-connection', sessionId);
+            document.getElementById('status').textContent = 'Connecting...';
+            document.getElementById('status').className = 'text-xl font-semibold text-[#FF5555]';
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('qrcode').classList.add('hidden');
+        }
+
+        socket.on('error', (error) => {
+            console.error('Error:', error);
+            document.getElementById('status').textContent = 'Error connecting to WhatsApp. Please try again.';
+            document.getElementById('status').className = 'text-xl font-semibold text-[#FF5555]';
+            document.getElementById('loader').classList.add('hidden');
         });
     </script>
 </body>

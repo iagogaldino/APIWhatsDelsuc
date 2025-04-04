@@ -19,7 +19,7 @@ export class WhatsAppService {
 
   async createSession(sessionId: string): Promise<Whatsapp> {
     try {
-      // const session = await this.sessionRepository.create(sessionId);
+      const session = await this.sessionRepository.create(sessionId);
   
       const client = await create(
         sessionId,
@@ -83,6 +83,15 @@ export class WhatsAppService {
     }
 
     return client.sendImageFromBase64(to, base64Image, 'image', caption);
+  }
+  
+  async sendFileBase64(sessionId: string, to: string, base64: string, filename: string, caption?: string, passId?: any): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendFileFromBase64(to, base64, filename, caption);
   }
 
   async closeSession(sessionId: string): Promise<void> {

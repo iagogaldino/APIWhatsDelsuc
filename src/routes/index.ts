@@ -1,9 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
-import { SessionController } from "../controllers/SessionController";
+import { sessionControllerMiddleware } from "../middleware/das";
 
 const router = Router();
-const sessionController = new SessionController();
+// const sessionController = new SessionController(whatsAppServiceInstance);
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -11,9 +11,13 @@ const upload = multer({
   }
 });
 
-router.post("/sessions", (req, res) => sessionController.create(req, res));
-router.post("/sessions/:sessionId/messages", (req, res) => sessionController.sendMessage(req, res));
-router.post("/sessions/:sessionId/images", upload.single('image'), (req, res) => sessionController.sendImageWithText(req, res));
-router.delete("/sessions/:sessionId", (req, res) => sessionController.close(req, res));
+// Usa o middleware para todas as rotas
+router.use(sessionControllerMiddleware);
+
+router.post("/sessions", (req: any, res) => req.sessionController.create(req, res));
+router.post("/sessions/:sessionId/messages", (req: any, res) => req.sessionController.sendMessage(req, res));
+router.post("/sessions/:sessionId/images", upload.single('image'), (req: any, res) => req.sessionController.sendImageWithText(req, res));
+router.post("/sessions/:sessionId/files", upload.single('image'), (req: any, res) => req.sessionController.sendFileBase64(req, res));
+router.delete("/sessions/:sessionId", (req: any, res) => req.sessionController.close(req, res));
 
 export { router };

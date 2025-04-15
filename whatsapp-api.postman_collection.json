@@ -92,6 +92,33 @@
       }
     },
     {
+      "name": "Send Image from URL",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/sessions/:sessionId/images/url",
+          "host": ["{{base_url}}"],
+          "path": ["sessions", ":sessionId", "images", "url"],
+          "variable": [
+            {
+              "key": "sessionId",
+              "value": "session123"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"to\": \"5511999999999@c.us\",\n    \"imageUrl\": \"https://example.com/image.jpg\",\n    \"caption\": \"Image from URL\"\n}"
+        }
+      }
+    },
+    {
       "name": "Close Session",
       "request": {
         "method": "DELETE",

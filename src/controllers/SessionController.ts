@@ -40,6 +40,26 @@ export class SessionController {
     }
   }
 
+  async sendImageFromUrl(req: Request, res: Response): Promise<Response> {
+    try {
+      const { sessionId } = req.params;
+      const { to, imageUrl, caption } = req.body;
+
+      if (!to) {
+        return res.status(400).json({ error: "Recipient (to) is required" });
+      }
+      if (!imageUrl) {
+        return res.status(400).json({ error: "Image URL is required" });
+      }
+
+      const result = await this.whatsAppService.sendImageWithText(sessionId, to, imageUrl, caption);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      console.log('API ERROR: ', error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   async sendImageWithText(req: Request, res: Response): Promise<Response> {
     try {
       const { sessionId } = req.params;

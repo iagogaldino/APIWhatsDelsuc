@@ -17,6 +17,7 @@ router.use(sessionControllerMiddleware);
 router.post("/sessions", (req: any, res) => req.sessionController.create(req, res));
 router.post("/sessions/:sessionId/messages", (req: any, res) => req.sessionController.sendMessage(req, res));
 router.post("/sessions/:sessionId/images", upload.single('image'), (req: any, res) => req.sessionController.sendImageWithText(req, res));
+router.post("/sessions/:sessionId/images/url", (req: any, res) => req.sessionController.sendImageFromUrl(req, res));
 router.post("/sessions/:sessionId/files", upload.single('image'), (req: any, res) => req.sessionController.sendFileBase64(req, res));
 router.delete("/sessions/:sessionId", (req: any, res) => req.sessionController.close(req, res));
 

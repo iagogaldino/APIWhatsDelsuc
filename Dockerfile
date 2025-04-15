@@ -40,6 +40,7 @@ WORKDIR /app
 
 # Copia arquivos do builder
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/public ./dist/public
 COPY package*.json ./
 
 # Instala apenas as dependências de produção

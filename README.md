@@ -1,27 +1,27 @@
-# API WhatsApp - Docker
+# WhatsApp API - Docker
 
-Este projeto é uma API que utiliza a biblioteca **Venom** para integração com o WhatsApp, executada dentro de um container Docker.
-
----
-
-## 📦 Pré-requisitos
-
-- [Docker](https://www.docker.com/) instalado na sua máquina.
-- Um arquivo `.env` com as variáveis de ambiente necessárias (exemplo abaixo).
+This project is an API that uses the **Venom** library to integrate with WhatsApp, running inside a Docker container.
 
 ---
 
-## ⚙️ Variáveis de Ambiente
+## 📦 Prerequisites
 
-Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+- [Docker](https://www.docker.com/) installed on your machine.
+- A `.env` file with the required environment variables (example below).
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the root of the project with the following variables:
 
 ```env
-# Variáveis de banco de dados PostgreSQL
+# PostgreSQL database variables
 DB_HOST=host.docker.internal
 DB_NAME=desluc
 DB_USER=postgres
 DB_PASS=admin
 DB_PORT=5432
 
-# Variáveis da aplicação
+# Application variables
 JWT_SECRET=token

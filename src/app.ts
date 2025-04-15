@@ -7,6 +7,7 @@ import { AppDataSource } from "./database";
 import { WhatsAppService } from "./services/WhatsAppService";
 
 const port = 5500;
+const host = "0.0.0.0";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
@@ -39,8 +40,8 @@ io.on('connection', (socket) => {
 });
 
 AppDataSource.initialize().then(() => {
-  httpServer.listen(port, "localhost", () => {
-    console.log(`Server running on port ${port}`);
+  httpServer.listen(port, host, () => {
+    console.log(`Server running on ${host}:${port}`);
   });
 });
 

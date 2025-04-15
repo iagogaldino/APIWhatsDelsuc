@@ -1,5 +1,6 @@
 import { create, Whatsapp } from "venom-bot";
 import { SessionRepository } from "../repositories/SessionRepository";
+import { ioApp } from "../app";
 
 export class WhatsAppService {
   private sessions: Map<string, Whatsapp>;
@@ -10,22 +11,36 @@ export class WhatsAppService {
     this.sessionRepository = new SessionRepository();
   }
 
-  async createSession(sessionId: string): Promise<Whatsapp> { // Retornando o client
+  private io: any;
+
+  setSocketIO(io: any) {
+    this.io = io;
+  }
+
+  async createSession(sessionId: string): Promise<Whatsapp> {
     try {
       const session = await this.sessionRepository.create(sessionId);
-      
+  
       const client = await create(
         sessionId,
-        undefined,
-        undefined,
+        (qr) => {
+          if (ioApp) {
+            console.log("QR Code received");
+            ioApp.to(sessionId).emit('qr', qr); // Emite o QR Code para o frontend via socket
+          } 
+        },
+        (statusSession) => {
+          console.log(`Session status: ${statusSession}`);
+          ioApp.to(sessionId).emit('ready'); // Informa ao frontend que a sessão está pronta
+        },
         {
-          headless: 'new'
+          headless: 'new', // Corrigido para um boolean, que é o valor esperado pelo Venom
         }
       );
-
+  
       this.sessions.set(sessionId, client);
       await this.sessionRepository.updateStatus(sessionId, "started");
-
+  
       return client;
     } catch (error: any) {
       await this.sessionRepository.updateStatus(sessionId, "error");
@@ -34,13 +49,49 @@ export class WhatsAppService {
   }
 
 
-  async sendMessage(sessionId: string, to: string, message: string): Promise<any> { // Especificar tipo de retorno
+  async sendMessage(sessionId: string, to: string, message: string): Promise<any> {
     const client = this.sessions.get(sessionId);
     if (!client) {
       throw new Error("Session not found");
     }
 
     return client.sendText(to, message);
+  }
+
+  async sendImageWithText(sessionId: string, to: string, imageUrl: string, caption?: string): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendImage(to, imageUrl, 'image', caption);
+  }
+
+  async sendImageFile(sessionId: string, to: string, buffer: Buffer, caption?: string): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendImageFromBase64(to, buffer.toString('base64'), 'image', caption);
+  }
+
+  async sendBase64Image(sessionId: string, to: string, base64Image: string, caption?: string): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendImageFromBase64(to, base64Image, 'image', caption);
+  }
+  
+  async sendFileBase64(sessionId: string, to: string, base64: string, filename: string, caption?: string, passId?: any): Promise<any> {
+    const client = this.sessions.get(sessionId);
+    if (!client) {
+      throw new Error("Session not found");
+    }
+
+    return client.sendFileFromBase64(to, base64, filename, caption);
   }
 
   async closeSession(sessionId: string): Promise<void> {

@@ -1,26 +1,25 @@
-# Etapa de build
-FROM node:20 AS builder
+# Etapa base
+FROM node:20
+
+# Evita prompts interativos
+ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
+# Copia somente arquivos necessários para instalar dependências
 COPY package*.json ./
-RUN npm install
 
+# Instala dependências mais rápido e silenciosamente
+RUN npm install --prefer-offline --no-audit
+
+# Copia o restante da aplicação
 COPY . .
+
+# Compila o TypeScript
 RUN npm run build
 
-# Etapa final com Chromium já incluído
-FROM ghcr.io/puppeteer/puppeteer:latest
+# Expõe a porta da API
+EXPOSE 3000
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-
-WORKDIR /app
-
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src/public ./dist/public
-COPY package*.json ./
-RUN npm install --omit=dev
-
-EXPOSE 5500
-
+# Comando de inicialização
 CMD ["node", "dist/app.js"]

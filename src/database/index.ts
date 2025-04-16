@@ -13,8 +13,12 @@ const config: PostgresConnectionOptions = {
   database: process.env.DB_NAME || "whatsapp_api",
   entities: [Session],
   synchronize: true,
-  logging: false // Facilita ver possíveis erros no console
+  logging: false,
+  ssl: {
+    rejectUnauthorized: false // Permite SSL mesmo sem certificado válido (ex: em ambientes dev ou Render)
+  }
 };
+
 
 console.log(config);
 

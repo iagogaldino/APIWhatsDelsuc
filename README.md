@@ -1,9 +1,9 @@
 
 # WhatsApp API Documentation
 
-Esta é uma API RESTful desenvolvida em Node.js com TypeScript que utiliza a biblioteca venom-bot para integração com WhatsApp.
+A RESTful API developed in Node.js with TypeScript using the venom-bot library for WhatsApp integration.
 
-## 🚀 Tecnologias
+## 🚀 Technologies
 
 - Node.js
 - TypeScript
@@ -13,17 +13,17 @@ Esta é uma API RESTful desenvolvida em Node.js com TypeScript que utiliza a bib
 - Socket.io
 - Docker
 
-## 📋 Pré-requisitos
+## 📋 Prerequisites
 
 - Node.js 20+
 - PostgreSQL
-- Docker (opcional)
+- Docker (optional)
 
-## 🔧 Configuração
+## 🔧 Configuration
 
-### Variáveis de Ambiente
+### Environment Variables
 
-Crie um arquivo `.env` baseado no `.env-example`:
+Create a `.env` file based on `.env-example`:
 
 ```env
 # PostgreSQL database variables
@@ -34,50 +34,55 @@ DB_PASS=admin
 DB_PORT=5432
 ```
 
-### Instalação Local
+### Local Installation
 
 ```bash
-# Instalar dependências
+# Install dependencies
 npm install
 
-# Executar em desenvolvimento
+# Run in development
 npm run dev
 
-# Compilar para produção
+# Build for production
 npm run build
 
-# Executar em produção
+# Run in production
 npm start
 ```
 
 ### Docker
 
+You can either build the image locally or pull it from Docker Hub:
+
 ```bash
-# Construir a imagem
+# Pull from Docker Hub
+docker pull iagogaldino/api-whatsapp:latest
+
+# Or build locally
 docker build -t whatsapp-api .
 
-# Executar o container
+# Run the container
 docker run -p 5500:5500 --name whatsapp-api whatsapp-api
 ```
 
-## 📱 Interface Web
+## 📱 Web Interface
 
-Acesse `http://localhost:5500` para visualizar a interface de QR Code e conexão com WhatsApp.
+Access `http://localhost:5500` to view the QR Code interface and WhatsApp connection.
 
 ## 🔌 Endpoints
 
-### Criar Sessão
+### Create Session
 
 ```http
 POST /api/generate-uuid
 
-Resposta:
+Response:
 {
     "uuid": "string"
 }
 ```
 
-### Enviar Mensagem de Texto
+### Send Text Message
 
 ```http
 POST /api/messages
@@ -89,7 +94,7 @@ Body:
 }
 ```
 
-### Enviar Imagem por URL
+### Send Image from URL
 
 ```http
 POST /api/images/url
@@ -102,7 +107,7 @@ Body:
 }
 ```
 
-### Enviar Imagem por Upload
+### Send Image by Upload
 
 ```http
 POST /api/images
@@ -110,11 +115,11 @@ Content-Type: multipart/form-data
 
 Form Data:
 - to: "5511999999999@c.us"
-- image: [arquivo]
+- image: [file]
 - caption: "Optional caption"
 ```
 
-### Enviar Arquivo Base64
+### Send Base64 File
 
 ```http
 POST /api/files
@@ -128,30 +133,30 @@ Body:
 }
 ```
 
-### Encerrar Sessão
+### End Session
 
 ```http
 DELETE /api/close
 ```
 
-## 🔄 Status de Conexão
+## 🔄 Connection Status
 
-A API utiliza Socket.IO para comunicação em tempo real dos estados de conexão:
+The API uses Socket.IO for real-time connection status:
 
-- `connecting`: Iniciando conexão
-- `waitingQR`: Aguardando leitura do QR Code
-- `connected`: WhatsApp conectado
-- `disconnected`: Desconectado
+- `connecting`: Starting connection
+- `waitingQR`: Waiting for QR Code scan
+- `connected`: WhatsApp connected
+- `disconnected`: Disconnected
 
-## ⚠️ Observações
+## ⚠️ Notes
 
-1. O número de telefone deve seguir o formato: `DDDNúmero@c.us`
-2. Para grupos use: `DDDNúmero-GroupId@g.us`
-3. Imagens em base64 devem incluir o prefixo MIME
-4. O QR Code expira após 20 segundos
+1. Phone number format: `DDDNumber@c.us`
+2. For groups use: `DDDNumber-GroupId@g.us`
+3. Base64 images must include MIME prefix
+4. QR Code expires after 20 seconds
 
-## 🚀 Deploy
+## 🚀 Deployment
 
-A aplicação está configurada para deploy via Docker, com todas as dependências necessárias incluindo o Chromium para o venom-bot.
+The application is configured for deployment via Docker, with all necessary dependencies including Chromium for venom-bot.
 
-O servidor roda na porta 5500 por padrão.
+The server runs on port 5500 by default.

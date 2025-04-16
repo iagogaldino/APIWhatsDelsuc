@@ -114,10 +114,10 @@
     </div>
 
     <script>
-        let sessionToken = localStorage.getItem('whatsapp_session_token');
+        let sessionUuid = localStorage.getItem('whatsapp_session_uuid');
         const socket = io();
 
-        async function generateToken() {
+        async function generateUuid() {
             try {
                 const response = await fetch('/api/create', {
                     method: 'POST',
@@ -127,31 +127,30 @@
                     body: JSON.stringify({})
                 });
                 const data = await response.json();
-                sessionToken = data.token;
-                localStorage.setItem('whatsapp_session_token', sessionToken);
+                sessionUuid = data.uuid;
+                localStorage.setItem('whatsapp_session_uuid', sessionUuid);
                 socket.emit('join', data.sessionId);
                 return data.sessionId;
             } catch (error) {
-                console.error('Error generating token:', error);
+                console.error('Error generating UUID:', error);
             }
         }
 
         async function connect() {
-            if (!sessionToken) {
-                await generateToken();
+            if (!sessionUuid) {
+                await generateUuid();
             } else {
-                // Tentar reconectar com token existente
                 try {
                     const response = await fetch('/api/reconnect', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ token: sessionToken })
+                        body: JSON.stringify({ uuid: sessionUuid })
                     });
                     const data = await response.json();
                     if (data.sessionId) {
-                        socket.emit('join', data.sessionId);
+                        socket.emit('join', data.sessionId);', data.sessionId);
                     } else {
                         // Token inválido, gerar novo
                         await generateToken();

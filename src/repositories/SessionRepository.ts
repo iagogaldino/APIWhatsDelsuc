@@ -2,7 +2,7 @@
 import { Repository } from "typeorm";
 import { Session } from "../entities/Session";
 import { AppDataSource } from "../database";
-import crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
 export class SessionRepository {
   private repository: Repository<Session>;
@@ -11,16 +11,12 @@ export class SessionRepository {
     this.repository = AppDataSource.getRepository(Session);
   }
 
-  private generateToken(): string {
-    return crypto.randomBytes(32).toString('hex');
-  }
-
   async create(sessionId: string): Promise<Session> {
-    const token = this.generateToken();
+    const uuid = uuidv4();
     const session = this.repository.create({
       sessionId,
       status: "created",
-      token
+      uuid
     });
     return await this.repository.save(session);
   }
@@ -29,8 +25,8 @@ export class SessionRepository {
     return await this.repository.findOne({ where: { sessionId } });
   }
 
-  async findByToken(token: string): Promise<Session | null> {
-    return await this.repository.findOne({ where: { token } });
+  async findByUuid(uuid: string): Promise<Session | null> {
+    return await this.repository.findOne({ where: { uuid } });
   }
 
   async updateStatus(sessionId: string, status: string): Promise<void> {

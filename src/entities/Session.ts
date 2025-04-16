@@ -13,10 +13,9 @@ export class Session {
   status!: string;
 
   @Column({
-    type: "varchar",
-    length: 64,
+    type: "uuid",
     unique: true,
-    nullable: true
+    nullable: false
   })
-  token!: string;
+  uuid!: string;
 }

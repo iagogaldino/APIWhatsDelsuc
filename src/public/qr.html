@@ -213,13 +213,6 @@
             ids.forEach(id => document.getElementById(id).classList.add('hidden'));
         }
 
-        function connect() {
-            socket.emit('start-connection', sessionId);
-            updateStatus('Verificando estado da conexão...', 'text-blue-600');
-            showElement('loader');
-            hideElements(['qrcode']);
-        }
-
         socket.on('error', (error) => {
             console.error('Error:', error);
             document.getElementById('status').textContent = 'Erro ao conectar. Por favor, tente novamente.';

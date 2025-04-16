@@ -9,15 +9,31 @@ export class SessionController {
 
   async create(req: Request, res: Response): Promise<Response> {
     try {
-      const { sessionId } = req.body;
+      const sessionId = `session_${Date.now()}`;
+      const session = await this.whatsAppService.createSession(sessionId);
+      return res.status(201).json({ 
+        message: "Session created successfully",
+        sessionId,
+        token: session.token
+      });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async reconnect(req: Request, res: Response): Promise<Response> {
+    try {
+      const { token } = req.body;
       
-      if (!sessionId) {
-        return res.status(400).json({ error: "SessionId is required" });
+      if (!token) {
+        return res.status(400).json({ error: "Token is required" });
       }
 
-      this.whatsAppService.createSession(sessionId);
-      const qrUrl = `${req.protocol}://${req.get('host')}/qr/${sessionId}`;
-      return res.status(201).json({ message: "Session created successfully", qrUrl });
+      const session = await this.whatsAppService.reconnectSession(token);
+      return res.status(200).json({ 
+        message: "Session reconnected successfully",
+        sessionId: session.sessionId
+      });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }

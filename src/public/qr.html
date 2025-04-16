@@ -114,8 +114,54 @@
     </div>
 
     <script>
-        const sessionId = window.location.pathname.split('/')[2];
+        let sessionToken = localStorage.getItem('whatsapp_session_token');
         const socket = io();
+
+        async function generateToken() {
+            try {
+                const response = await fetch('/api/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                const data = await response.json();
+                sessionToken = data.token;
+                localStorage.setItem('whatsapp_session_token', sessionToken);
+                socket.emit('join', data.sessionId);
+                return data.sessionId;
+            } catch (error) {
+                console.error('Error generating token:', error);
+            }
+        }
+
+        async function connect() {
+            if (!sessionToken) {
+                await generateToken();
+            } else {
+                // Tentar reconectar com token existente
+                try {
+                    const response = await fetch('/api/reconnect', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ token: sessionToken })
+                    });
+                    const data = await response.json();
+                    if (data.sessionId) {
+                        socket.emit('join', data.sessionId);
+                    } else {
+                        // Token inválido, gerar novo
+                        await generateToken();
+                    }
+                } catch (error) {
+                    console.error('Error reconnecting:', error);
+                    await generateToken();
+                }
+            }
+        }
 
         socket.emit('join', sessionId);
 

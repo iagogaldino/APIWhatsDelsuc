@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { WhatsAppService } from "../services/WhatsAppService";
+import { v4 } from "uuid";
 
 export class SessionController {
 
@@ -7,22 +8,16 @@ export class SessionController {
     
   }
 
-  async create(req: Request, res: Response): Promise<Response> {
+  async generateUuid(req: Request, res: Response): Promise<Response> {
     try {
-      const { sessionId } = req.body;
-      
-      if (!sessionId) {
-        return res.status(400).json({ error: "SessionId is required" });
-      }
-
-      this.whatsAppService.createSession(sessionId);
-      const qrUrl = `${req.protocol}://${req.get('host')}/qr/${sessionId}`;
-      return res.status(201).json({ message: "Session created successfully", qrUrl });
+      const uuid = v4();
+      return res.status(201).json(
+        {uuid});
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
   }
-
+ 
   async sendMessage(req: Request, res: Response): Promise<Response> {
     try {
       const { sessionId } = req.params;

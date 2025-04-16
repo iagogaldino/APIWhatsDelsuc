@@ -1,25 +1,46 @@
-# Etapa base
-FROM node:20
-
-# Evita prompts interativos
-ENV DEBIAN_FRONTEND=noninteractive
+# Build step
+FROM node:20 AS builder
 
 WORKDIR /app
 
-# Copia somente arquivos necessários para instalar dependências
 COPY package*.json ./
+RUN npm install
 
-# Instala dependências mais rápido e silenciosamente
-RUN npm install --prefer-offline --no-audit
-
-# Copia o restante da aplicação
 COPY . .
-
-# Compila o TypeScript
 RUN npm run build
 
-# Expõe a porta da API
-EXPOSE 3000
+# Final image
+FROM node:20
 
-# Comando de inicialização
+# Instala Chromium e dependências
+RUN apt-get update && apt-get install -y \
+    chromium \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
+    --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+WORKDIR /app
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/public ./dist/public
+COPY package*.json ./
+RUN npm install --omit=dev
+
+EXPOSE 5500
+
 CMD ["node", "dist/app.js"]

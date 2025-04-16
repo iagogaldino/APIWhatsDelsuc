@@ -5,10 +5,23 @@ import { ioApp } from "../app";
 export class WhatsAppService {
   private sessions: Map<string, Whatsapp>;
   private sessionRepository: SessionRepository;
+  private connectionStates: Map<string, string>;
 
   constructor() {
     this.sessions = new Map();
+    this.connectionStates = new Map();
     this.sessionRepository = new SessionRepository();
+  }
+
+  private updateConnectionState(sessionId: string, state: string) {
+    this.connectionStates.set(sessionId, state);
+    if (ioApp) {
+      ioApp.to(sessionId).emit('connectionState', state);
+    }
+  }
+
+  async getConnectionState(sessionId: string): Promise<string> {
+    return this.connectionStates.get(sessionId) || 'disconnected';
   }
 
   private io: any;
@@ -17,10 +30,13 @@ export class WhatsAppService {
     this.io = io;
   }
 
-  async createSession(sessionId: string): Promise<Whatsapp> {
+  async createSession(sessionId: string): Promise<any> {
     try {
       const session = await this.sessionRepository.create(sessionId);
-  
+      if (!session) {
+        throw new Error("Falha ao gerar token da sessão");
+      }
+
       const client = await create(
         sessionId,
         (qr) => {
@@ -31,16 +47,30 @@ export class WhatsAppService {
         },
         (statusSession) => {
           console.log(`Session status: ${statusSession}`);
-          ioApp.to(sessionId).emit('ready'); // Informa ao frontend que a sessão está pronta
+          switch (statusSession) {
+            case 'isLogged':
+            case 'successChat':
+              ioApp.to(sessionId).emit('ready');
+              if (statusSession === 'successChat') {
+                this.updateConnectionState(sessionId, 'ready');
+              }
+              break;
+            case 'notLogged':
+              ioApp.to(sessionId).emit('notLogged');
+              break;
+            case 'disconnected':
+              this.updateConnectionState(sessionId, 'disconnected');
+              break;
+          }
         },
         {
           headless: 'new', // Corrigido para um boolean, que é o valor esperado pelo Venom
         }
       );
-  
+
       this.sessions.set(sessionId, client);
       await this.sessionRepository.updateStatus(sessionId, "started");
-  
+
       return client;
     } catch (error: any) {
       await this.sessionRepository.updateStatus(sessionId, "error");
@@ -84,7 +114,7 @@ export class WhatsAppService {
 
     return client.sendImageFromBase64(to, base64Image, 'image', caption);
   }
-  
+
   async sendFileBase64(sessionId: string, to: string, base64: string, filename: string, caption?: string, passId?: any): Promise<any> {
     const client = this.sessions.get(sessionId);
     if (!client) {

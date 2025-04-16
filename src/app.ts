@@ -19,11 +19,14 @@ app.use(express.json({ limit: '50mb' }));  // Permite requisições JSON até 50
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));  // Permite requisições URL-encoded até 50MB
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(router);
 
-app.get('/qr/:sessionId', (req, res) => {
+// Rota principal redirecionando para criar uma nova sessão
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'qr.html'));
 });
+
+// Demais rotas da API
+app.use('/api', router);
 
 // Configuração do Socket.IO
 export let ioApp: any = io;

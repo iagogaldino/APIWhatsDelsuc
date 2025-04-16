@@ -33,7 +33,7 @@ export class WhatsAppService {
   async createSession(sessionId: string): Promise<Whatsapp> {
     try {
       const session = await this.sessionRepository.create(sessionId);
-  
+
       const client = await create(
         sessionId,
         (qr) => {
@@ -44,16 +44,30 @@ export class WhatsAppService {
         },
         (statusSession) => {
           console.log(`Session status: ${statusSession}`);
-          ioApp.to(sessionId).emit('ready'); // Informa ao frontend que a sessão está pronta
+          switch (statusSession) {
+            case 'isLogged':
+            case 'successChat':
+              ioApp.to(sessionId).emit('ready');
+              if (statusSession === 'successChat') {
+                this.updateConnectionState(sessionId, 'ready');
+              }
+              break;
+            case 'notLogged':
+              ioApp.to(sessionId).emit('notLogged');
+              break;
+            case 'disconnected':
+              this.updateConnectionState(sessionId, 'disconnected');
+              break;
+          }
         },
         {
           headless: 'new', // Corrigido para um boolean, que é o valor esperado pelo Venom
         }
       );
-  
+
       this.sessions.set(sessionId, client);
       await this.sessionRepository.updateStatus(sessionId, "started");
-  
+
       return client;
     } catch (error: any) {
       await this.sessionRepository.updateStatus(sessionId, "error");
@@ -97,7 +111,7 @@ export class WhatsAppService {
 
     return client.sendImageFromBase64(to, base64Image, 'image', caption);
   }
-  
+
   async sendFileBase64(sessionId: string, to: string, base64: string, filename: string, caption?: string, passId?: any): Promise<any> {
     const client = this.sessions.get(sessionId);
     if (!client) {

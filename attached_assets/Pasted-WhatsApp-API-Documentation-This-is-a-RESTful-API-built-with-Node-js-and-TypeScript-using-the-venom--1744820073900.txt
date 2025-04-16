@@ -1,0 +1,152 @@
+WhatsApp API Documentation
+This is a RESTful API built with Node.js and TypeScript, using the venom-bot library to integrate with WhatsApp.
+
+🚀 Technologies
+Node.js
+
+TypeScript
+
+Express
+
+PostgreSQL
+
+Venom-bot
+
+Socket.io
+
+Docker
+
+📋 Prerequisites
+Node.js 20+
+
+PostgreSQL
+
+Docker (optional)
+
+🔧 Setup
+Environment Variables
+Create a .env file based on the .env-example:
+
+env
+Copy
+Edit
+# PostgreSQL database variables
+DB_HOST=localhost
+DB_NAME=whatsapp_api
+DB_USER=postgres
+DB_PASS=admin
+DB_PORT=5432
+Local Installation
+bash
+Copy
+Edit
+# Install dependencies
+npm install
+
+# Run in development mode
+npm run dev
+
+# Build for production
+npm run build
+
+# Start in production mode
+npm start
+Using Docker
+bash
+Copy
+Edit
+# Build the image
+docker build -t whatsapp-api .
+
+# Run the container
+docker run -p 5500:5500 --name whatsapp-api whatsapp-api
+📱 Web Interface
+Visit http://localhost:5500 to access the QR Code and WhatsApp connection interface.
+
+🔌 API Endpoints
+Create Session
+http
+Copy
+Edit
+POST /api/generate-uuid
+
+Response:
+{
+  "uuid": "string"
+}
+Send Text Message
+http
+Copy
+Edit
+POST /api/messages
+
+Body:
+{
+  "to": "5511999999999@c.us",
+  "message": "Hello World!"
+}
+Send Image by URL
+http
+Copy
+Edit
+POST /api/images/url
+
+Body:
+{
+  "to": "5511999999999@c.us",
+  "imageUrl": "https://example.com/image.jpg",
+  "caption": "Optional caption"
+}
+Send Image by Upload
+http
+Copy
+Edit
+POST /api/images
+Content-Type: multipart/form-data
+
+Form Data:
+- to: "5511999999999@c.us"
+- image: [file]
+- caption: "Optional caption"
+Send File via Base64
+http
+Copy
+Edit
+POST /api/files
+
+Body:
+{
+  "to": "5511999999999@c.us",
+  "base64": "data:image/jpeg;base64,...",
+  "fileName": "image.jpg",
+  "caption": "Optional caption"
+}
+Close Session
+http
+Copy
+Edit
+DELETE /api/close
+🔄 Connection Status
+The API uses Socket.IO to provide real-time updates on the connection state:
+
+connecting: Establishing connection
+
+waitingQR: Waiting for QR code scan
+
+connected: WhatsApp connected
+
+disconnected: Disconnected
+
+⚠️ Notes
+Phone numbers must follow the format: DDDAreaCodeNumber@c.us
+
+For groups, use: DDDAreaCodeNumber-GroupId@g.us
+
+Base64 images must include the proper MIME type prefix
+
+QR Code expires after 20 seconds
+
+🚀 Deployment
+The application is fully Docker-ready, with all required dependencies including Chromium for venom-bot.
+
+By default, the server runs on port 5500.

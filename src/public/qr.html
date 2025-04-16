@@ -130,18 +130,50 @@
         });
 
         socket.on('ready', () => {
-            document.getElementById('status').textContent = 'WhatsApp Conectado!';
-            document.getElementById('status').className = 'text-xl font-medium text-green-600';
-            document.getElementById('qrcode').classList.add('hidden');
-            document.getElementById('loader').classList.add('hidden');
+            updateStatus('WhatsApp Conectado!', 'text-green-600');
+            hideElements(['qrcode', 'loader']);
         });
+
+        socket.on('connectionState', (state) => {
+            switch(state) {
+                case 'connecting':
+                    updateStatus('Iniciando conexão...', 'text-blue-600');
+                    showElement('loader');
+                    hideElements(['qrcode']);
+                    break;
+                case 'waitingQR':
+                    updateStatus('Aguardando QR Code...', 'text-yellow-600');
+                    break;
+                case 'connected':
+                    updateStatus('WhatsApp Conectado!', 'text-green-600');
+                    hideElements(['qrcode', 'loader']);
+                    break;
+                case 'disconnected':
+                    updateStatus('Desconectado', 'text-red-600');
+                    hideElements(['qrcode', 'loader']);
+                    break;
+            }
+        });
+
+        function updateStatus(message, className) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `text-xl font-medium ${className}`;
+        }
+
+        function showElement(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function hideElements(ids) {
+            ids.forEach(id => document.getElementById(id).classList.add('hidden'));
+        }
 
         function connect() {
             socket.emit('start-connection', sessionId);
-            document.getElementById('status').textContent = 'Conectando...';
-            document.getElementById('status').className = 'text-xl font-medium text-blue-600';
-            document.getElementById('loader').classList.remove('hidden');
-            document.getElementById('qrcode').classList.add('hidden');
+            updateStatus('Verificando estado da conexão...', 'text-blue-600');
+            showElement('loader');
+            hideElements(['qrcode']);
         }
 
         socket.on('error', (error) => {

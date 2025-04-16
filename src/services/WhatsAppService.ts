@@ -5,10 +5,23 @@ import { ioApp } from "../app";
 export class WhatsAppService {
   private sessions: Map<string, Whatsapp>;
   private sessionRepository: SessionRepository;
+  private connectionStates: Map<string, string>;
 
   constructor() {
     this.sessions = new Map();
+    this.connectionStates = new Map();
     this.sessionRepository = new SessionRepository();
+  }
+
+  private updateConnectionState(sessionId: string, state: string) {
+    this.connectionStates.set(sessionId, state);
+    if (ioApp) {
+      ioApp.to(sessionId).emit('connectionState', state);
+    }
+  }
+
+  async getConnectionState(sessionId: string): Promise<string> {
+    return this.connectionStates.get(sessionId) || 'disconnected';
   }
 
   private io: any;

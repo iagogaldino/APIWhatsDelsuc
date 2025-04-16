@@ -7,14 +7,13 @@ export class SessionController {
     
   }
 
-  async create(req: Request, res: Response): Promise<Response> {
+  async generateUuid(req: Request, res: Response): Promise<Response> {
     try {
-      const sessionId = `session_${Date.now()}`;
-      const session = await this.whatsAppService.createSession(sessionId);
+      const uuid = v4();
+      const sessionId = `session_${uuid}`;
       return res.status(201).json({ 
-        message: "Session created successfully",
-        sessionId,
-        token: session.token
+        uuid,
+        sessionId
       });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });

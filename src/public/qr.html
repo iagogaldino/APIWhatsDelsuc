@@ -117,50 +117,36 @@
         let sessionUuid = localStorage.getItem('whatsapp_session_uuid');
         const socket = io();
 
-        async function generateUuid() {
+        let sessionData = null;
+
+        async function getUuid() {
             try {
-                const response = await fetch('/api/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({})
-                });
+                const response = await fetch('/api/generate-uuid');
                 const data = await response.json();
-                sessionUuid = data.uuid;
-                localStorage.setItem('whatsapp_session_uuid', sessionUuid);
-                socket.emit('join', data.sessionId);
-                return data.sessionId;
+                sessionData = data;
+                document.getElementById('token-display').textContent = `UUID: ${data.uuid}`;
+                return data;
             } catch (error) {
-                console.error('Error generating UUID:', error);
+                console.error('Error getting UUID:', error);
+                updateStatus('Erro ao gerar UUID', 'text-red-600');
             }
         }
 
         async function connect() {
-            if (!sessionUuid) {
-                await generateUuid();
-            } else {
-                try {
-                    const response = await fetch('/api/reconnect', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ uuid: sessionUuid })
-                    });
-                    const data = await response.json();
-                    if (data.sessionId) {
-                        socket.emit('join', data.sessionId);', data.sessionId);
-                    } else {
-                        // Token inválido, gerar novo
-                        await generateToken();
-                    }
-                } catch (error) {
-                    console.error('Error reconnecting:', error);
-                    await generateToken();
-                }
+            if (!sessionData) {
+                await getUuid();
+            }
+            if (sessionData) {
+                socket.emit('join', sessionData.sessionId);
+                socket.emit('start-connection', sessionData.sessionId);
+                updateStatus('Verificando estado da conexão...', 'text-blue-600');
+                showElement('loader');
+                hideElements(['qrcode']);
             }
         }
+
+        // Carregar UUID ao iniciar a página
+        window.addEventListener('load', getUuid);
 
 
         socket.on('qr', (qr) => {

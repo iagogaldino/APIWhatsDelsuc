@@ -13,7 +13,7 @@ const upload = multer({
 
 router.use(sessionControllerMiddleware);
 
-router.post("/create", (req: any, res) => req.sessionController.create(req, res));
+router.get("/generate-uuid", (req: any, res) => req.sessionController.generateUuid(req, res));
 router.post("/reconnect", (req: any, res) => req.sessionController.reconnect(req, res));
 router.post("/messages", (req: any, res) => req.sessionController.sendMessage(req, res));
 router.post("/images", upload.single('image'), (req: any, res) => req.sessionController.sendImageWithText(req, res));

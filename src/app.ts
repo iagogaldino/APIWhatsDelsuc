@@ -22,12 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Rota principal redirecionando para criar uma nova sessão
 app.get('/', (req, res) => {
-  const sessionId = `session_${Date.now()}`;
-  res.redirect(`/qr/${sessionId}`);
-});
-
-// Rota do QR code
-app.get('/qr/:sessionId', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'qr.html'));
 });
 

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { WhatsAppService } from "../services/WhatsAppService";
+import { v4 } from "uuid";
 
 export class SessionController {
 
@@ -10,34 +11,13 @@ export class SessionController {
   async generateUuid(req: Request, res: Response): Promise<Response> {
     try {
       const uuid = v4();
-      const sessionId = `session_${uuid}`;
-      return res.status(201).json({ 
-        uuid,
-        sessionId
-      });
+      return res.status(201).json(
+        {uuid});
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
   }
-
-  async reconnect(req: Request, res: Response): Promise<Response> {
-    try {
-      const { token } = req.body;
-      
-      if (!token) {
-        return res.status(400).json({ error: "Token is required" });
-      }
-
-      const session = await this.whatsAppService.reconnectSession(token);
-      return res.status(200).json({ 
-        message: "Session reconnected successfully",
-        sessionId: session.sessionId
-      });
-    } catch (error: any) {
-      return res.status(500).json({ error: error.message });
-    }
-  }
-
+ 
   async sendMessage(req: Request, res: Response): Promise<Response> {
     try {
       const { sessionId } = req.params;

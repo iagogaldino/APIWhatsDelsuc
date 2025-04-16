@@ -33,7 +33,7 @@ export class WhatsAppService {
   async createSession(sessionId: string): Promise<any> {
     try {
       const session = await this.sessionRepository.create(sessionId);
-      if (!session || !session.token) {
+      if (!session) {
         throw new Error("Falha ao gerar token da sessão");
       }
 

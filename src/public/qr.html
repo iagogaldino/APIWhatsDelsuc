@@ -114,17 +114,20 @@
     </div>
 
     <script>
-        let sessionUuid = localStorage.getItem('whatsapp_session_uuid');
+        let sessionUuid = localStorage.getItem('whatsapp_session_uuid') ? localStorage.getItem('whatsapp_session_uuid') : null;
         const socket = io();
 
-        let sessionData = null;
+        if (sessionUuid) {
+            connect();
+        } else {
+            getUuid();
+        }
 
         async function getUuid() {
             try {
                 const response = await fetch('/api/generate-uuid');
                 const data = await response.json();
-                sessionData = data;
-                document.getElementById('token-display').textContent = `UUID: ${data.uuid}`;
+                sessionUuid = data.uuid;
                 return data;
             } catch (error) {
                 console.error('Error getting UUID:', error);
@@ -133,21 +136,14 @@
         }
 
         async function connect() {
-            if (!sessionData) {
-                await getUuid();
-            }
-            if (sessionData) {
-                socket.emit('join', sessionData.sessionId);
-                socket.emit('start-connection', sessionData.sessionId);
+            if (sessionUuid) {
+                socket.emit('join', sessionUuid);
+                socket.emit('start-connection', sessionUuid);
                 updateStatus('Verificando estado da conexão...', 'text-blue-600');
                 showElement('loader');
                 hideElements(['qrcode']);
             }
         }
-
-        // Carregar UUID ao iniciar a página
-        window.addEventListener('load', getUuid);
-
 
         socket.on('qr', (qr) => {
             document.getElementById('loader').classList.add('hidden');
@@ -162,6 +158,7 @@
         socket.on('ready', () => {
             updateStatus('WhatsApp Conectado!', 'text-green-600');
             hideElements(['qrcode', 'loader']);
+            localStorage.setItem('whatsapp_session_uuid', sessionUuid);
         });
 
         socket.on('connectionState', (state) => {

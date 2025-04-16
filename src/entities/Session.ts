@@ -15,7 +15,7 @@ export class Session {
   @Column({
     type: "uuid",
     unique: true,
-    nullable: false
+    nullable: true
   })
   uuid!: string;
 }

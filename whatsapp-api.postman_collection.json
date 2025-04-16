@@ -6,23 +6,26 @@
   },
   "item": [
     {
-      "name": "Create Session",
+      "name": "Generate UUID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/generate-uuid",
+          "host": ["{{base_url}}"],
+          "path": ["api", "generate-uuid"]
+        }
+      }
+    },
+    {
+      "name": "Reconnect Session",
       "request": {
         "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
+        "header": [],
         "url": {
-          "raw": "{{base_url}}/sessions",
+          "raw": "{{base_url}}/api/reconnect",
           "host": ["{{base_url}}"],
-          "path": ["sessions"]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"sessionId\": \"session123\"\n}"
+          "path": ["api", "reconnect"]
         }
       }
     },
@@ -37,15 +40,9 @@
           }
         ],
         "url": {
-          "raw": "{{base_url}}/sessions/:sessionId/messages",
+          "raw": "{{base_url}}/api/messages",
           "host": ["{{base_url}}"],
-          "path": ["sessions", ":sessionId", "messages"],
-          "variable": [
-            {
-              "key": "sessionId",
-              "value": "session123"
-            }
-          ]
+          "path": ["api", "messages"]
         },
         "body": {
           "mode": "raw",
@@ -54,20 +51,14 @@
       }
     },
     {
-      "name": "Send Image with Text",
+      "name": "Send Image (Upload)",
       "request": {
         "method": "POST",
         "header": [],
         "url": {
-          "raw": "{{base_url}}/sessions/:sessionId/images",
+          "raw": "{{base_url}}/api/images",
           "host": ["{{base_url}}"],
-          "path": ["sessions", ":sessionId", "images"],
-          "variable": [
-            {
-              "key": "sessionId",
-              "value": "session123"
-            }
-          ]
+          "path": ["api", "images"]
         },
         "body": {
           "mode": "formdata",
@@ -84,7 +75,7 @@
             },
             {
               "key": "caption",
-              "value": "Image caption",
+              "value": "Optional caption",
               "type": "text"
             }
           ]
@@ -102,19 +93,34 @@
           }
         ],
         "url": {
-          "raw": "{{base_url}}/sessions/:sessionId/images/url",
+          "raw": "{{base_url}}/api/images/url",
           "host": ["{{base_url}}"],
-          "path": ["sessions", ":sessionId", "images", "url"],
-          "variable": [
-            {
-              "key": "sessionId",
-              "value": "session123"
-            }
-          ]
+          "path": ["api", "images", "url"]
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"to\": \"5511999999999@c.us\",\n    \"imageUrl\": \"https://example.com/image.jpg\",\n    \"caption\": \"Image from URL\"\n}"
+          "raw": "{\n    \"to\": \"5511999999999@c.us\",\n    \"imageUrl\": \"https://example.com/image.jpg\",\n    \"caption\": \"Optional caption\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Send File (Base64)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/files",
+          "host": ["{{base_url}}"],
+          "path": ["api", "files"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"to\": \"5511999999999@c.us\",\n    \"base64\": \"data:image/jpeg;base64,...\",\n    \"fileName\": \"image.jpg\",\n    \"caption\": \"Optional caption\"\n}"
         }
       }
     },
@@ -122,16 +128,11 @@
       "name": "Close Session",
       "request": {
         "method": "DELETE",
+        "header": [],
         "url": {
-          "raw": "{{base_url}}/sessions/:sessionId",
+          "raw": "{{base_url}}/api/close",
           "host": ["{{base_url}}"],
-          "path": ["sessions", ":sessionId"],
-          "variable": [
-            {
-              "key": "sessionId",
-              "value": "session123"
-            }
-          ]
+          "path": ["api", "close"]
         }
       }
     }

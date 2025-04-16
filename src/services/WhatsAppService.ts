@@ -30,9 +30,12 @@ export class WhatsAppService {
     this.io = io;
   }
 
-  async createSession(sessionId: string): Promise<Whatsapp> {
+  async createSession(sessionId: string): Promise<any> {
     try {
       const session = await this.sessionRepository.create(sessionId);
+      if (!session || !session.token) {
+        throw new Error("Falha ao gerar token da sessão");
+      }
 
       const client = await create(
         sessionId,

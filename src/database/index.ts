@@ -20,6 +20,6 @@ const config: PostgresConnectionOptions = {
 };
 
 
-console.log(config);
+// console.log(config);
 
 export const AppDataSource = new DataSource(config);
